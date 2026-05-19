@@ -6,7 +6,8 @@ export default function Home() {
   const [latest, setLatest] = useState(null);
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedPlanet, setSelectedPlanet] =
+    useState(null);
 
   async function fetchData() {
     try {
@@ -21,8 +22,6 @@ export default function Home() {
       setLatest(latestData);
       setStats(statsData);
       setHistory(historyData);
-
-      setLoading(false);
 
     } catch (err) {
       console.log(err);
@@ -53,16 +52,20 @@ export default function Home() {
       style={{
         background:
           "radial-gradient(circle at top, #111, #000)",
+
         color: "white",
+
         minHeight: "100vh",
-        padding: "30px",
+
+        padding: "20px",
+
         fontFamily: "Arial"
       }}
     >
       <h1
         style={{
           textAlign: "center",
-          fontSize: "56px",
+          fontSize: "50px",
           marginBottom: "10px"
         }}
       >
@@ -73,24 +76,11 @@ export default function Home() {
         style={{
           textAlign: "center",
           opacity: 0.7,
-          marginBottom: "40px"
+          marginBottom: "30px"
         }}
       >
-        SpaceComputer-Powered Galactic Discovery Engine
+        Interactive Galactic Discovery Engine
       </p>
-
-      {loading && (
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: "30px",
-            fontSize: "20px",
-            animation: "pulse 1s infinite"
-          }}
-        >
-          🛰️ Scanning Cosmic Sectors...
-        </div>
-      )}
 
       {stats && (
         <div
@@ -98,209 +88,191 @@ export default function Home() {
             display: "flex",
             justifyContent: "center",
             gap: "20px",
-            flexWrap: "wrap",
-            marginBottom: "40px"
+            marginBottom: "25px",
+            flexWrap: "wrap"
           }}
         >
-          <div style={statCardStyle}>
-            <h3>Total Discoveries</h3>
-            <p>{stats.totalDiscoveries}</p>
-          </div>
+          <StatCard
+            title="Discoveries"
+            value={stats.totalDiscoveries}
+          />
 
           {Object.entries(stats.rarityCounts).map(
             ([rarity, count]) => (
-              <div
+              <StatCard
                 key={rarity}
-                style={{
-                  ...statCardStyle,
-                  border:
-                    `1px solid ${rarityColor(rarity)}`
-                }}
-              >
-                <h3
-                  style={{
-                    color: rarityColor(rarity)
-                  }}
-                >
-                  {rarity}
-                </h3>
-
-                <p>{count}</p>
-              </div>
+                title={rarity}
+                value={count}
+                color={rarityColor(rarity)}
+              />
             )
           )}
         </div>
       )}
 
-      {latest && (
-        <div
-          style={{
-            maxWidth: "850px",
-            margin: "0 auto 50px auto",
-            border:
-              `2px solid ${rarityColor(latest.rarity)}`,
-
-            boxShadow:
-              `0 0 25px ${rarityColor(latest.rarity)}`,
-
-            borderRadius: "24px",
-            overflow: "hidden",
-            background: "#111"
-          }}
-        >
-          <img
-            src={latest.image}
-            alt={latest.planetName}
-            style={{
-              width: "100%",
-              height: "350px",
-              objectFit: "cover"
-            }}
-          />
-
-          <div style={{ padding: "25px" }}>
-            <h2
-              style={{
-                color: rarityColor(latest.rarity),
-                fontSize: "38px"
-              }}
-            >
-              {latest.planetName}
-            </h2>
-
-            <p>
-              <strong>Sector:</strong>
-              {" "}
-              {latest.sector}
-            </p>
-
-            <p>
-              <strong>Coordinates:</strong>
-              {" "}
-              X:
-              {latest.coordinates?.x}
-              {" "}
-              Y:
-              {latest.coordinates?.y}
-            </p>
-
-            <p>
-              <strong>Biome:</strong>
-              {" "}
-              {latest.biome}
-            </p>
-
-            <p>
-              <strong>Moons:</strong>
-              {" "}
-              {latest.moons}
-            </p>
-
-            <p>
-              <strong>Temperature:</strong>
-              {" "}
-              {latest.temperature}°C
-            </p>
-
-            <p>
-              <strong>Danger:</strong>
-              {" "}
-              {latest.danger}
-            </p>
-
-            <p>
-              <strong>Rarity:</strong>
-              {" "}
-              <span
-                style={{
-                  color: rarityColor(latest.rarity)
-                }}
-              >
-                {latest.rarity}
-              </span>
-            </p>
-
-            <p
-              style={{
-                marginTop: "20px",
-                fontStyle: "italic",
-                opacity: 0.8
-              }}
-            >
-              "{latest.lore}"
-            </p>
-          </div>
-        </div>
-      )}
-
-      <h2
-        style={{
-          textAlign: "center",
-          marginBottom: "25px"
-        }}
-      >
-        🚀 Live Discovery Feed
-      </h2>
-
       <div
         style={{
           display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit,minmax(320px,1fr))",
-
+          gridTemplateColumns: "2fr 1fr",
           gap: "20px"
         }}
       >
-        {history.map((item) => (
+        <div
+          style={{
+            background: "#050505",
+            border: "1px solid #222",
+            borderRadius: "20px",
+            height: "800px",
+            position: "relative",
+            overflow: "hidden"
+          }}
+        >
           <div
-            key={item.id}
             style={{
-              background: "#111",
-              borderRadius: "20px",
-              overflow: "hidden",
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "radial-gradient(white 1px, transparent 1px)",
 
-              border:
-                `1px solid ${rarityColor(item.rarity)}`,
+              backgroundSize: "50px 50px",
 
-              boxShadow:
-                `0 0 12px ${rarityColor(item.rarity)}`
+              opacity: 0.08
+            }}
+          />
+
+          {history.map((planet) => {
+            const x =
+              (planet.coordinates?.x || 0) % 95;
+
+            const y =
+              (planet.coordinates?.y || 0) % 95;
+
+            return (
+              <div
+                key={planet.id}
+                onClick={() =>
+                  setSelectedPlanet(planet)
+                }
+                style={{
+                  position: "absolute",
+
+                  left: `${x}%`,
+
+                  top: `${y}%`,
+
+                  width: "14px",
+
+                  height: "14px",
+
+                  borderRadius: "50%",
+
+                  background:
+                    rarityColor(planet.rarity),
+
+                  boxShadow:
+                    `0 0 15px ${rarityColor(
+                      planet.rarity
+                    )}`,
+
+                  cursor: "pointer",
+
+                  transition: "0.2s"
+                }}
+                title={planet.planetName}
+              />
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            background: "#111",
+            borderRadius: "20px",
+            padding: "20px",
+            border: "1px solid #222"
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: "20px"
             }}
           >
-            <img
-              src={item.image}
-              alt={item.planetName}
-              style={{
-                width: "100%",
-                height: "200px",
-                objectFit: "cover"
-              }}
-            />
+            🪐 Planet Details
+          </h2>
 
-            <div style={{ padding: "20px" }}>
-              <h3
+          {!selectedPlanet && (
+            <p
+              style={{
+                textAlign: "center",
+                opacity: 0.7
+              }}
+            >
+              Select a planet from the galaxy map
+            </p>
+          )}
+
+          {selectedPlanet && (
+            <>
+              <img
+                src={selectedPlanet.image}
+                alt={selectedPlanet.planetName}
                 style={{
-                  color: rarityColor(item.rarity)
+                  width: "100%",
+                  borderRadius: "14px",
+                  marginBottom: "15px"
+                }}
+              />
+
+              <h2
+                style={{
+                  color:
+                    rarityColor(
+                      selectedPlanet.rarity
+                    )
                 }}
               >
-                {item.planetName}
-              </h3>
+                {selectedPlanet.planetName}
+              </h2>
 
               <p>
                 <strong>Sector:</strong>
                 {" "}
-                {item.sector}
+                {selectedPlanet.sector}
+              </p>
+
+              <p>
+                <strong>Coordinates:</strong>
+                {" "}
+                X:
+                {selectedPlanet.coordinates?.x}
+                {" "}
+                Y:
+                {selectedPlanet.coordinates?.y}
               </p>
 
               <p>
                 <strong>Biome:</strong>
                 {" "}
-                {item.biome}
+                {selectedPlanet.biome}
+              </p>
+
+              <p>
+                <strong>Moons:</strong>
+                {" "}
+                {selectedPlanet.moons}
+              </p>
+
+              <p>
+                <strong>Temperature:</strong>
+                {" "}
+                {selectedPlanet.temperature}°C
               </p>
 
               <p>
                 <strong>Danger:</strong>
                 {" "}
-                {item.danger}
+                {selectedPlanet.danger}
               </p>
 
               <p>
@@ -309,35 +281,51 @@ export default function Home() {
                 <span
                   style={{
                     color:
-                      rarityColor(item.rarity)
+                      rarityColor(
+                        selectedPlanet.rarity
+                      )
                   }}
                 >
-                  {item.rarity}
+                  {selectedPlanet.rarity}
                 </span>
               </p>
 
               <p
                 style={{
-                  marginTop: "10px",
-                  fontSize: "14px",
-                  opacity: 0.8
+                  marginTop: "15px",
+                  opacity: 0.8,
+                  fontStyle: "italic"
                 }}
               >
-                {item.lore}
+                "{selectedPlanet.lore}"
               </p>
-            </div>
-          </div>
-        ))}
+            </>
+          )}
+        </div>
       </div>
     </main>
   );
 }
 
-const statCardStyle = {
-  background: "#111",
-  padding: "20px",
-  borderRadius: "18px",
-  minWidth: "120px",
-  textAlign: "center",
-  border: "1px solid #333"
-};
+function StatCard({
+  title,
+  value,
+  color = "white"
+}) {
+  return (
+    <div
+      style={{
+        background: "#111",
+        padding: "15px",
+        borderRadius: "16px",
+        border: `1px solid ${color}`,
+        minWidth: "110px",
+        textAlign: "center"
+      }}
+    >
+      <h3 style={{ color }}>{title}</h3>
+
+      <p>{value}</p>
+    </div>
+  );
+}
