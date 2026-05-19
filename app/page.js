@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
   const [latest, setLatest] = useState(null);
@@ -9,31 +10,62 @@ export default function Home() {
   const [selectedPlanet, setSelectedPlanet] =
     useState(null);
 
-  async function fetchData() {
-    try {
-      const latestRes = await fetch("/api/latest");
-      const statsRes = await fetch("/api/stats");
-      const historyRes = await fetch("/api/history");
-
-      const latestData = await latestRes.json();
-      const statsData = await statsRes.json();
-      const historyData = await historyRes.json();
-
-      setLatest(latestData);
-      setStats(statsData);
-      setHistory(historyData);
-
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   useEffect(() => {
-    fetchData();
+    async function fetchInitialData() {
+      try {
+        const latestRes = await fetch("/api/latest");
+        const statsRes = await fetch("/api/stats");
+        const historyRes = await fetch("/api/history");
 
-    const interval = setInterval(fetchData, 5000);
+        const latestData = await latestRes.json();
+        const statsData = await statsRes.json();
+        const historyData = await historyRes.json();
 
-    return () => clearInterval(interval);
+        setLatest(latestData);
+        setStats(statsData);
+        setHistory(historyData);
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchInitialData();
+
+    const socket = io(
+      process.env.NEXT_PUBLIC_SOCKET_URL
+    );
+
+    socket.on("newDiscovery", (planet) => {
+      setLatest(planet);
+
+      setHistory((prev) => [planet, ...prev]);
+
+      setStats((prev) => {
+        if (!prev) return prev;
+
+        const updated = {
+          ...prev,
+          totalDiscoveries:
+            prev.totalDiscoveries + 1,
+
+          rarityCounts: {
+            ...prev.rarityCounts,
+
+            [planet.rarity]:
+              (prev.rarityCounts[
+                planet.rarity
+              ] || 0) + 1
+          }
+        };
+
+        return updated;
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
 
   }, []);
 
@@ -79,7 +111,7 @@ export default function Home() {
           marginBottom: "30px"
         }}
       >
-        Interactive Galactic Discovery Engine
+        Real-Time Galactic Discovery Engine
       </p>
 
       {stats && (
@@ -127,19 +159,6 @@ export default function Home() {
             overflow: "hidden"
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage:
-                "radial-gradient(white 1px, transparent 1px)",
-
-              backgroundSize: "50px 50px",
-
-              opacity: 0.08
-            }}
-          />
-
           {history.map((planet) => {
             const x =
               (planet.coordinates?.x || 0) % 95;
@@ -174,11 +193,8 @@ export default function Home() {
                       planet.rarity
                     )}`,
 
-                  cursor: "pointer",
-
-                  transition: "0.2s"
+                  cursor: "pointer"
                 }}
-                title={planet.planetName}
               />
             );
           })}
@@ -204,7 +220,6 @@ export default function Home() {
           {!selectedPlanet && (
             <p
               style={{
-                textAlign: "center",
                 opacity: 0.7
               }}
             >
@@ -264,15 +279,15 @@ export default function Home() {
               </p>
 
               <p>
-                <strong>Temperature:</strong>
-                {" "}
-                {selectedPlanet.temperature}°C
-              </p>
-
-              <p>
                 <strong>Danger:</strong>
                 {" "}
                 {selectedPlanet.danger}
+              </p>
+
+              <p>
+                <strong>Temperature:</strong>
+                {" "}
+                {selectedPlanet.temperature}°C
               </p>
 
               <p>
