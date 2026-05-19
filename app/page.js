@@ -9,11 +9,11 @@ export default function Home() {
   async function fetchData() {
     try {
       const latestRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/latest`
+       "/api/latest"
       );
 
       const statsRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/stats`
+       "/api/stats"
       );
 
       const latestData = await latestRes.json();
