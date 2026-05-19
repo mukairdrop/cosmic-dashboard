@@ -57,23 +57,25 @@ export default function Home() {
     >
       <h1
         style={{
-          fontSize: "48px",
           textAlign: "center",
+          fontSize: "48px",
           marginBottom: "20px"
         }}
       >
-        🌌 Cosmic Dashboard
+        🌌 Cosmic Wayfinder
       </h1>
 
       {stats && (
         <div
           style={{
             textAlign: "center",
-            marginBottom: "30px",
+            marginBottom: "40px",
             fontSize: "20px"
           }}
         >
-          Total Discoveries: {stats.totalDiscoveries}
+          Total Discoveries:
+          {" "}
+          {stats.totalDiscoveries}
         </div>
       )}
 
@@ -82,17 +84,30 @@ export default function Home() {
           style={{
             border: `2px solid ${rarityColor(latest.rarity)}`,
             boxShadow:
-              `0 0 20px ${rarityColor(latest.rarity)}`,
+              `0 0 25px ${rarityColor(latest.rarity)}`,
             borderRadius: "20px",
             padding: "30px",
-            maxWidth: "400px",
-            margin: "0 auto 40px auto",
-            textAlign: "center"
+            maxWidth: "450px",
+            margin: "0 auto 50px auto",
+            background: "#111"
           }}
         >
-          <h2>🌟 Latest Discovery</h2>
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: "20px"
+            }}
+          >
+            🌟 Latest Discovery
+          </h2>
 
-          <h3>{latest.type}</h3>
+          <h3
+            style={{
+              color: rarityColor(latest.rarity)
+            }}
+          >
+            {latest.planetName}
+          </h3>
 
           <p>
             <strong>Sector:</strong>
@@ -101,9 +116,39 @@ export default function Home() {
           </p>
 
           <p>
+            <strong>Biome:</strong>
+            {" "}
+            {latest.biome}
+          </p>
+
+          <p>
+            <strong>Moons:</strong>
+            {" "}
+            {latest.moons}
+          </p>
+
+          <p>
+            <strong>Temperature:</strong>
+            {" "}
+            {latest.temperature}°C
+          </p>
+
+          <p>
+            <strong>Danger:</strong>
+            {" "}
+            {latest.danger}
+          </p>
+
+          <p>
             <strong>Rarity:</strong>
             {" "}
-            {latest.rarity}
+            <span
+              style={{
+                color: rarityColor(latest.rarity)
+              }}
+            >
+              {latest.rarity}
+            </span>
           </p>
 
           <p style={{ fontSize: "12px" }}>
@@ -134,20 +179,55 @@ export default function Home() {
           <div
             key={item.id}
             style={{
-              border: `1px solid ${rarityColor(item.rarity)}`,
-              padding: "20px",
-              borderRadius: "12px",
-              background: "#111",
+              border:
+                `1px solid ${rarityColor(item.rarity)}`,
+
               boxShadow:
-                `0 0 10px ${rarityColor(item.rarity)}`
+                `0 0 10px ${rarityColor(item.rarity)}`,
+
+              borderRadius: "12px",
+
+              padding: "20px",
+
+              background: "#111"
             }}
           >
-            <h3>{item.type}</h3>
+            <h3
+              style={{
+                color: rarityColor(item.rarity)
+              }}
+            >
+              {item.planetName}
+            </h3>
 
             <p>
               <strong>Sector:</strong>
               {" "}
               {item.sector}
+            </p>
+
+            <p>
+              <strong>Biome:</strong>
+              {" "}
+              {item.biome}
+            </p>
+
+            <p>
+              <strong>Moons:</strong>
+              {" "}
+              {item.moons}
+            </p>
+
+            <p>
+              <strong>Temperature:</strong>
+              {" "}
+              {item.temperature}°C
+            </p>
+
+            <p>
+              <strong>Danger:</strong>
+              {" "}
+              {item.danger}
             </p>
 
             <p>
